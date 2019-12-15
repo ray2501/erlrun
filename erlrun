@@ -1,0 +1,27 @@
+#!/usr/bin/env tclsh
+
+if {$argc >= 1} {
+    set runfile [lindex $argv 0]
+} else {
+    if {[catch {set files [glob *.beam]} errMsg]==1} {
+	puts $errMsg
+        return	
+    }
+
+    if {[llength $files]==1} {
+        set runfile [file rootname [lindex $files 0]]
+    } else {
+	# User needs to specify (more than 1)
+	puts "Please give the file name."
+        return	
+    }
+}
+
+if {[file exists "$runfile.beam"]==0} {
+    puts "File does not exist."	
+    return
+}
+
+# OK, try to execute
+set var [list erl -noshell -s $runfile start -s init stop]
+exec {*}$var >@stdout
